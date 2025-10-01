@@ -1,8 +1,25 @@
 // import React, { useState, useEffect } from 'react';
-import { Image, View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Profile = () => {
+  const [realname, setRealname] = useState('User');
   // const [imageUri, setImageUri] = useState(null);
+
+  useEffect(() => {
+    const loadRealname = async () => {
+      try {
+        const storedRealname = await AsyncStorage.getItem('realname');
+        if (storedRealname) {
+          setRealname(storedRealname);
+        }
+      } catch (error) {
+        console.log('Error loading realname:', error);
+      }
+    };
+    loadRealname();
+  }, []);
 
   // useEffect(() => {
   //   const fetchProfileImage = async () => {
@@ -20,6 +37,7 @@ const Profile = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.realnameText}>{realname}</Text>
       {/* {imageUri ? (
         <Image source={{ uri: imageUri }} style={styles.profileImage} />
       ) : (
@@ -36,6 +54,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     right: 40,
     bottom: 30,
+  },
+  realnameText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   profileImage: {
     width: 81,

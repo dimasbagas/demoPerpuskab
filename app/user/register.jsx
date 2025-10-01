@@ -205,6 +205,9 @@ const Register = () => {
             }
             try {
               const fullData = {
+                username: nik || '',
+                realname: namaLengkap || '',
+                passwd: password || '',
                 nama: namaLengkap || '',
                 nik: nik || '',
                 tanggal_lahir: previousData.tanggalLahir || '',
@@ -218,7 +221,7 @@ const Register = () => {
                 tempat_lahir: previousData.tempatLahir || '',
                 institusi: previousData.institusi || '',
               };
-              const response = await fetch('https://975a28b17724.ngrok-free.app/auth/register/', {
+              const response = await fetch('https://48148bf56dc7.ngrok-free.app/auth/register/', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

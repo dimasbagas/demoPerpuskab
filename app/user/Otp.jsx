@@ -30,7 +30,7 @@ const Otp = () => {
     console.log('Request body:', { email, token: otp });
 
     try {
-      const response = await fetch('https://975a28b17724.ngrok-free.app/auth/verify-token/', {
+      const response = await fetch('https://48148bf56dc7.ngrok-free.app/auth/verify-token/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -43,6 +43,31 @@ const Otp = () => {
         console.log('Verification response:', data);
         if (data.token) {
           await AsyncStorage.setItem('token', data.token);
+          // Fetch user data and store realname
+          try {
+            const userResponse = await fetch('https://48148bf56dc7.ngrok-free.app/auth/users/', {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${data.token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+            console.log('User API response status:', userResponse.status);
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+              console.log('User data from API:', userData);
+              const realname = Array.isArray(userData) ? userData[0]?.realname : userData?.realname;
+              console.log('Extracted realname:', realname);
+              if (realname) {
+                await AsyncStorage.setItem('realname', realname);
+              }
+            } else {
+              const errorText = await userResponse.text();
+              console.log('User API error:', userResponse.status, errorText);
+            }
+          } catch (error) {
+            console.log('Error fetching user data on verification:', error);
+          }
         }
         Alert.alert('Success', 'OTP verified successfully');
         router.push('/page/HomePage');

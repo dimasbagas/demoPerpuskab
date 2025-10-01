@@ -1,16 +1,35 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useState, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BukuFavorit from "../../components/HomeScreen/BukuFavorit";
 import CariBuku from "../../components/HomeScreen/CariBuku";
 import Profile from "../../components/HomeScreen/Profile";
 import ScrollMenu from "../../components/HomeScreen/ScrollMenu";
 
 const HomePage = () => {
+  const [realname, setRealname] = useState('user');
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const storedRealname = await AsyncStorage.getItem('realname');
+        console.log('Loaded realname from storage:', storedRealname);
+        if (storedRealname) {
+          setRealname(storedRealname);
+        }
+      } catch (error) {
+        console.log('Error loading user data:', error);
+      }
+    };
+    loadUserData();
+  }, []);
+
   return (
     <View style={style.containerContent}>
       <View style={{ justifyContent: "flex-start", width: "100%" }}>
         <View style={style.titleContainer}>
           <Text style={style.title}>Hello</Text>
-          <Text style={{ color: "#d1d1d1ff", fontSize: 40 }}>albert</Text>
+          <Text style={{ color: "#d1d1d1ff", fontSize: 40 }}>{realname}</Text>
           <Text style={{ color: "#d1d1d1ff", fontSize: 16 }}>
             Selamat Datang
           </Text>

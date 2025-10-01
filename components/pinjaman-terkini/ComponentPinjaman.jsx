@@ -10,7 +10,7 @@ const ComponentPinjaman = () => {
 
   const fetchLoans = async () => {
     try {
-      const response = await fetch('https://9f6e206da7ea.ngrok-free.app/api/loans/');
+      const response = await fetch('https://728b88e77d52.ngrok-free.app/api/biblio/');
       const data = await response.json();
       setLoans(data);
     } catch (error) {

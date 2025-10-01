@@ -12,7 +12,7 @@ const ComponentAkunSaya = () => {
   const fetchMembership = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await fetch('https://975a28b17724.ngrok-free.app/user/members/', {
+      const response = await fetch('https://728b88e77d52.ngrok-free.app/user/members/', {
         headers: {
           'Authorization': `Token ${token}`,
         },

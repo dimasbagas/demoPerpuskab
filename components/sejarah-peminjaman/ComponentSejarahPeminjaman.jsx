@@ -10,7 +10,7 @@ const ComponentSejarahPeminjaman = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch('https://9f6e206da7ea.ngrok-free.app/api/loan-history/');
+      const response = await fetch('https://bd5f0b37f8a6.ngrok-free.app/api/loan-history/');
       const data = await response.json();
       setHistory(data);
     } catch (error) {
