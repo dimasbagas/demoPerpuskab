@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   StyleSheet,
   Text,
@@ -10,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { loginUser, getUserInfo, saveUserSession } from "../../components/utils/api";
 
 const Login = () => {
   const router = useRouter();
@@ -18,56 +18,40 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
+    console.log('🔐 Attempting login with NIK:', username, 'Password:', password);
+    const result = await loginUser(username, password);
+
+    if (!result.ok || !result.data) {
+      console.log('❌ Login failed:', result.data);
+      Alert.alert('Error', result.data?.message || 'Login gagal');
+      return;
+    }
+
+    const token = result.data.access_token;
+    const nik = result.data.username;
+
+    console.log('✅ Received token:', token);
+    console.log('✅ Received username (NIK):', nik);
+
+    if (!token || !nik) {
+      console.warn('⚠️ Token atau username tidak ditemukan dalam response:', result);
+      Alert.alert('Error', 'Token atau username tidak valid');
+      return;
+    }
+
     try {
-      console.log('Attempting login with NIK:', username, 'Password:', password);
-      const response = await fetch('https://48148bf56dc7.ngrok-free.app/auth/login/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
-      if (response.ok) {
-        const token = data.access_token || data.token;
-        if (token) {
-          await AsyncStorage.setItem('token', token);
-          // Fetch user data and store realname
-          try {
-            const userResponse = await fetch('https://48148bf56dc7.ngrok-free.app/auth/users/', {
-              method: 'GET',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-            });
-            console.log('User API response status:', userResponse.status);
-            if (userResponse.ok) {
-              const userData = await userResponse.json();
-              console.log('User data from API:', userData);
-              const realname = Array.isArray(userData) ? userData[0]?.realname : userData?.realname;
-              console.log('Extracted realname:', realname);
-              if (realname) {
-                await AsyncStorage.setItem('realname', realname);
-              }
-            } else {
-              const errorText = await userResponse.text();
-              console.log('User API error:', userResponse.status, errorText);
-            }
-          } catch (error) {
-            console.log('Error fetching user data on login:', error);
-          }
-        }
-        Alert.alert('Success', 'Login successful');
-        router.push('/page/HomePage');
-      } else {
-        Alert.alert('Error', data.message || 'Login failed');
-      }
+      const realname = await getUserInfo(token, nik);
+      console.log('👤 Fetched realname:', realname);
+
+      await saveUserSession({ token, username: nik, realname });
+      console.log('📦 Session saved');
+
+      Alert.alert('Success', 'Login successful');
+      console.log('➡️ Navigating to homepage...');
+      router.push('/page/HomePage');
     } catch (error) {
-      console.log('Network error:', error);
-      Alert.alert('Error', 'Network error');
+      console.log('❌ Gagal ambil data user:', error);
+      Alert.alert('Error', 'Gagal ambil data user');
     }
   };
 
@@ -82,9 +66,7 @@ const Login = () => {
         </View>
       </View>
 
-      {/* Form Input */}
       <View style={{ flex: 1, gap: 10 }}>
-        {/* NIK */}
         <View style={{ marginTop: 20 }}>
           <Text style={{ fontSize: 15, color: "#717171", right: -20 }}>NIK</Text>
           <TextInput
@@ -95,7 +77,6 @@ const Login = () => {
           />
         </View>
 
-        {/* Password */}
         <View>
           <Text style={{ fontSize: 15, color: "#717171", right: -20 }}>Password</Text>
           <View style={{ position: "relative" }}>
@@ -119,7 +100,6 @@ const Login = () => {
           </View>
         </View>
 
-        {/* Button */}
         <TouchableOpacity style={style.button} onPress={handleLogin}>
           <Text style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}>
             Sign In
@@ -153,13 +133,6 @@ const style = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 20,
   },
-  inputProfil: {
-    height: 70,
-    width: 70,
-    backgroundColor: "#D9D9D9",
-    borderRadius: 100,
-    marginTop: 30,
-  },
   textInput: {
     height: 50,
     width: 330,
@@ -181,6 +154,7 @@ const style = StyleSheet.create({
   },
   icons: {
     position: "absolute",
-    right: 30, top: 15,
-  }
+    right: 30,
+    top: 15,
+  },
 });

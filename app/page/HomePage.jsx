@@ -38,24 +38,22 @@ const HomePage = () => {
           <Profile />
         </View>
       </View>
-      {/* cari buku */}
+
       <CariBuku />
-      {/* menu */}
+
       <View style={{ marginTop: 0, justifyContent: "flex-start" }}>
         <ScrollMenu />
       </View>
-      {/* buku favorit */}
-      <View
-        style={{ alignItems: "flex-start", width: "100%", paddingLeft: 20 }}
-      >
+
+      <View style={{ alignItems: "flex-start", width: "100%", paddingLeft: 20 }}>
         <Text style={{ fontSize: 24, fontWeight: "600", color: "#305763" }}>
           Buku favorit
         </Text>
       </View>
+
       <BukuFavorit />
-      <View
-        style={{ alignItems: "flex-start", width: "100%", paddingLeft: 20 }}
-      >
+
+      <View style={{ alignItems: "flex-start", width: "100%", paddingLeft: 20 }}>
         <Text style={{ fontSize: 24, fontWeight: "600", color: "#305763" }}>
           Novel
         </Text>
